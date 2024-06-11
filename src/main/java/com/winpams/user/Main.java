@@ -1,4 +1,4 @@
-package com.winpams;
+package com.winpams.user;
 
 
 public class Main {
