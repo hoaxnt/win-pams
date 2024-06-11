@@ -8,15 +8,15 @@ import org.aspectj.lang.annotation.Pointcut;
 @Aspect
 public class CatchAspect {
 
-    @Pointcut("@annotation(com.winpams.core.annotations.Catch)")
-    public void catchAnnotationMethod() {
+    @Pointcut("execution(* com.winpams..*(..)) && @within(com.winpams.core.annotations.Catch)")
+    public void catchAnnotatedMethodsInAnnotatedClasses() {
     }
 
-    @Pointcut("@within(com.winpams.core.annotations.Catch)")
-    public void catchAnnotationClass() {
+    @Pointcut("execution(* (@com.winpams.core.annotations.Catch *).*(..))")
+    public void catchAnnotatedMethodsInClasses() {
     }
 
-    @Around("catchAnnotationMethod() || catchAnnotationClass()")
+    @Around("catchAnnotatedMethodsInAnnotatedClasses() || catchAnnotatedMethodsInClasses()")
     public Object handleExceptions(ProceedingJoinPoint joinPoint) throws Throwable {
         try {
             return joinPoint.proceed();

@@ -11,6 +11,7 @@ repositories {
 }
 
 dependencies {
+    implementation("org.javatuples:javatuples:1.2")
     implementation("io.github.cdimascio:dotenv-java:2.2.0")
     implementation("com.mysql:mysql-connector-j:8.4.0")
     implementation("org.aspectj:aspectjrt:1.9.7")
@@ -26,4 +27,12 @@ tasks.test {
 java {
     sourceCompatibility = JavaVersion.VERSION_1_8
     targetCompatibility = JavaVersion.VERSION_1_8
+}
+
+tasks.withType<JavaCompile> {
+    options.compilerArgs.addAll(listOf("-Xlint:-options"))
+}
+
+tasks.withType<Test> {
+    useJUnitPlatform()
 }
