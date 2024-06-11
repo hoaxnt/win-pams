@@ -2,13 +2,14 @@ package com.winpams.core;
 
 
 import com.winpams.core.annotations.Catch;
+import com.winpams.core.model.BaseModel;
+import org.javatuples.Pair;
 
-import java.sql.Connection;
-import java.sql.DriverManager;
-import java.sql.SQLException;
-import java.sql.Statement;
+import java.sql.*;
+import java.util.Map;
+import java.util.StringJoiner;
 
-@Catch
+
 public class Database implements AutoCloseable {
     public final Connection connection;
 
@@ -24,8 +25,7 @@ public class Database implements AutoCloseable {
 
     @Override
     public void close() throws Exception {
-        if (connection == null)
-            return;
+        if (connection == null) return;
 
         connection.close();
     }
@@ -47,11 +47,78 @@ public class Database implements AutoCloseable {
     }
 
 
-    public void execute(String query) throws SQLException {
-        Statement statement = connection.createStatement();
+    public ResultSet execute(String query, Object... params) throws SQLException {
+        PreparedStatement statement = connection.prepareStatement(query);
+        for (int i = 0; i < params.length; i++) {
+            statement.setObject(i + 1, params[i]);
+        }
+        return statement.executeQuery();
+    }
 
-        statement.executeUpdate(query);
+    public <T extends BaseModel> Pair<String, Object[]> buildQuery(T model, DatabaseOperation mode, String[] selectColumns, Long id) throws Exception {
+        String tableName = model.getClass().getAnnotation(com.winpams.core.annotations.Table.class).name();
+        Map<String, Object> columns = model.dump();
+        String query;
+        Object[] params;
 
-        statement.close();
+        switch (mode) {
+            case INSERT:
+                StringJoiner insertColumnsJoiner = new StringJoiner(", ");
+                StringJoiner valuesJoiner = new StringJoiner(", ");
+                columns.forEach((key, value) -> {
+                    insertColumnsJoiner.add(key);
+                    valuesJoiner.add("?");
+                });
+                params = columns.values().toArray();
+                query = "INSERT INTO " + tableName + " (" + insertColumnsJoiner.toString() + ") VALUES (" + valuesJoiner.toString() + ")";
+                break;
+
+            case UPDATE:
+                StringJoiner updateJoiner = new StringJoiner(", ");
+                columns.forEach((key, value) -> {
+                    updateJoiner.add(key + " = ?");
+                });
+                params = new Object[columns.size() + 1];
+                int i = 0;
+                for (Object value : columns.values()) {
+                    params[i++] = value;
+                }
+                params[i] = model.id;  // Assuming the model has a getId() method
+                query = "UPDATE " + tableName + " SET " + updateJoiner.toString() + " WHERE id = ?";
+
+                break;
+            case DELETE:
+                params = new Object[]{model.id};
+                query = "DELETE FROM " + tableName + " WHERE id = ?";
+                break;
+
+            case SELECT:
+                String selectColumnsString = (selectColumns == null || selectColumns.length == 0) ? "*" : String.join(", ", selectColumns);
+                params = new Object[]{id};
+                query = "SELECT " + selectColumnsString + " FROM " + tableName;
+
+                if (id != null) {
+                    query += " WHERE id = ?";
+                }
+
+                break;
+
+            default:
+                throw new IllegalArgumentException("Invalid operation: " + mode);
+        }
+
+        return new Pair<>(query, params);
+    }
+
+    public <T extends BaseModel> Pair<String, Object[]> buildQuery(T model, DatabaseOperation mode) throws Exception {
+        return buildQuery(model, mode, null, null);
+    }
+
+    public <T extends BaseModel> Pair<String, Object[]> buildQuery(T model, DatabaseOperation mode, String[] selectColumns) throws Exception {
+        return buildQuery(model, mode, selectColumns, null);
+    }
+
+    public <T extends BaseModel> Pair<String, Object[]> buildQuery(T model, DatabaseOperation mode, Long id) throws Exception {
+        return buildQuery(model, mode, null, id);
     }
 }
