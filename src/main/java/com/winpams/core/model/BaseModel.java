@@ -1,25 +1,28 @@
 package com.winpams.core.model;
 
+import com.winpams.core.Database;
+import com.winpams.core.DatabaseOperation;
 import com.winpams.core.annotations.*;
 import com.winpams.core.exceptions.NoAnnotation;
+import org.javatuples.Pair;
 
-import java.lang.reflect.Executable;
 import java.lang.reflect.Field;
 import java.sql.ResultSet;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
-
-public class BaseModel {
+public abstract class BaseModel {
     @Id
     @Column(name = "id")
-    private Long id;
+    public Long id;
 
     @Column(name = "created_at")
-    private Long createdAt;
+    public Long createdAt;
 
     @Column(name = "updated_at")
-    private Long updatedAt;
+    public Long updatedAt;
 
     public BaseModel() {
         this.createdAt = System.currentTimeMillis();
@@ -56,5 +59,78 @@ public class BaseModel {
         return map;
     }
 
-    // TODO: implement crud operations
+    private <T extends BaseModel> List<T> load(ResultSet result) throws Exception {
+
+        @SuppressWarnings("unchecked") Class<T> modelClass = (Class<T>) this.getClass();
+        List<T> models = new ArrayList<>();
+
+        do {
+            T model = modelClass.getDeclaredConstructor().newInstance();
+            for (Field field : modelClass.getDeclaredFields()) {
+                if (field.isAnnotationPresent(Column.class)) {
+                    field.setAccessible(true);
+                    Column column = field.getAnnotation(Column.class);
+                    Object value = result.getObject(column.name());
+                    field.set(model, value);
+                }
+            }
+            models.add(model);
+        } while (result.next());
+
+        return models;
+    }
+
+    public void save() throws Exception {
+        Database db = Database.getInstance();
+
+        if (this.id != null) {
+            Pair<String, Object[]> query = db.buildQuery(this, DatabaseOperation.UPDATE);
+            db.execute(query.getValue0(), query.getValue1());
+
+            return;
+        }
+
+        Pair<String, Object[]> query = db.buildQuery(this, DatabaseOperation.INSERT);
+        db.execute(query.getValue0(), query.getValue1());
+    }
+
+    public void delete() throws Exception {
+        Database db = Database.getInstance();
+        Pair<String, Object[]> query = db.buildQuery(this, DatabaseOperation.DELETE);
+        db.execute(query.getValue0(), query.getValue1());
+    }
+
+    public <T extends BaseModel> List<T> find(Long id, String[] cols) throws Exception {
+        Database db = Database.getInstance();
+        @SuppressWarnings("unchecked")
+
+        Pair<String, Object[]> query = db.buildQuery(this, DatabaseOperation.SELECT, cols, id);
+
+        System.out.println(query.getValue0());
+
+        return null;
+//        ResultSet result = db.execute(query.getValue0(), query.getValue1());
+//
+//        if (!result.next()) return null;
+//
+//        return load(result);
+    }
+
+    public <T extends BaseModel> T find(Long id) throws Exception {
+        if (id == null) throw new IllegalArgumentException("id cannot be null");
+
+        List<T> models = find(id, null);
+
+        if (models == null) return null;
+
+        return models.isEmpty() ? null : models.get(0);
+    }
+
+    public <T extends BaseModel> List<T> all() throws Exception {
+        return find(null, null);
+    }
+
+    public <T extends BaseModel> List<T> all(String[] cols) throws Exception {
+        return find(null, cols);
+    }
 }
