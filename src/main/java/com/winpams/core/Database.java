@@ -9,7 +9,18 @@ import java.sql.*;
 import java.util.Map;
 import java.util.StringJoiner;
 
+
+// TODO: Add where filter
+
 public class Database implements AutoCloseable {
+    public enum Operation {
+        SELECT,
+        INSERT,
+        UPDATE,
+        DELETE,
+        WHERE
+    }
+
     public final Connection connection;
 
     private Database() throws SQLException {
@@ -59,7 +70,7 @@ public class Database implements AutoCloseable {
         return connection.createStatement().executeQuery(query);
     }
 
-    public <T extends BaseModel> Pair<String, Object[]> buildQuery(T model, DatabaseOperation mode, String[] selectColumns, Integer id) throws Exception {
+    public <T extends BaseModel> Pair<String, Object[]> buildQuery(T model, Operation mode, String[] selectColumns, Integer id) throws Exception {
         String tableName = model.getClass().getAnnotation(Entity.class).name();
         Map<String, Object> columns = model.dump();
         String query;
@@ -114,15 +125,15 @@ public class Database implements AutoCloseable {
         return new Pair<>(query, params);
     }
 
-    public <T extends BaseModel> Pair<String, Object[]> buildQuery(T model, DatabaseOperation mode) throws Exception {
+    public <T extends BaseModel> Pair<String, Object[]> buildQuery(T model, Operation mode) throws Exception {
         return buildQuery(model, mode, null, null);
     }
 
-    public <T extends BaseModel> Pair<String, Object[]> buildQuery(T model, DatabaseOperation mode, String[] selectColumns) throws Exception {
+    public <T extends BaseModel> Pair<String, Object[]> buildQuery(T model, Operation mode, String[] selectColumns) throws Exception {
         return buildQuery(model, mode, selectColumns, null);
     }
 
-    public <T extends BaseModel> Pair<String, Object[]> buildQuery(T model, DatabaseOperation mode, Integer id) throws Exception {
+    public <T extends BaseModel> Pair<String, Object[]> buildQuery(T model, Operation mode, Integer id) throws Exception {
         return buildQuery(model, mode, null, id);
     }
 }

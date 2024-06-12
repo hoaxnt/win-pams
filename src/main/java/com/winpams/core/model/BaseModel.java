@@ -1,7 +1,6 @@
 package com.winpams.core.model;
 
 import com.winpams.core.Database;
-import com.winpams.core.DatabaseOperation;
 import com.winpams.core.annotations.*;
 import com.winpams.core.exceptions.NoAnnotation;
 import org.javatuples.Pair;
@@ -73,26 +72,26 @@ public abstract class BaseModel {
         Database db = Database.getInstance();
 
         if (this.id != null) {
-            Pair<String, Object[]> query = db.buildQuery(this, DatabaseOperation.UPDATE);
+            Pair<String, Object[]> query = db.buildQuery(this, Database.Operation.UPDATE);
             db.execute(query.getValue0(), query.getValue1());
 
             return;
         }
 
-        Pair<String, Object[]> query = db.buildQuery(this, DatabaseOperation.INSERT);
+        Pair<String, Object[]> query = db.buildQuery(this, Database.Operation.INSERT);
         db.execute(query.getValue0(), query.getValue1());
     }
 
     public void delete() throws Exception {
         Database db = Database.getInstance();
-        Pair<String, Object[]> query = db.buildQuery(this, DatabaseOperation.DELETE);
+        Pair<String, Object[]> query = db.buildQuery(this, Database.Operation.DELETE);
         db.execute(query.getValue0(), query.getValue1());
     }
 
     public <T extends BaseModel> List<T> find(Integer id, String[] cols) throws Exception {
         Database db = Database.getInstance();
 
-        Pair<String, Object[]> query = db.buildQuery(this, DatabaseOperation.SELECT, cols, id);
+        Pair<String, Object[]> query = db.buildQuery(this, Database.Operation.SELECT, cols, id);
         ResultSet result = db.execute(query.getValue0(), query.getValue1());
 
         if (!result.next()) return null;
