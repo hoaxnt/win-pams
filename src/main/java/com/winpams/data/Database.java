@@ -1,8 +1,9 @@
-package com.winpams.core;
+package com.winpams.data;
 
 
-import com.winpams.core.annotations.Entity;
-import com.winpams.core.model.BaseModel;
+import com.winpams.core.Config;
+import com.winpams.data.annotations.Entity;
+import com.winpams.data.model.BaseModel;
 import org.javatuples.Pair;
 
 import java.sql.*;

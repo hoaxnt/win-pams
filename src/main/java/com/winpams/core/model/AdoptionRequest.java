@@ -1,7 +1,8 @@
 package com.winpams.core.model;
 
-import com.winpams.core.annotations.Entity;
-import com.winpams.core.annotations.Column;
+import com.winpams.data.annotations.Column;
+import com.winpams.data.annotations.Entity;
+import com.winpams.data.model.BaseModel;
 
 @Entity(name = "adoption_requests")
 public class AdoptionRequest extends BaseModel {

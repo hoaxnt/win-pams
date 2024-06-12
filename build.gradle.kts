@@ -14,8 +14,6 @@ dependencies {
     implementation("org.javatuples:javatuples:1.2")
     implementation("io.github.cdimascio:dotenv-java:2.2.0")
     implementation("com.mysql:mysql-connector-j:8.4.0")
-    implementation("org.aspectj:aspectjrt:1.9.7")
-    implementation("org.aspectj:aspectjweaver:1.9.7")
     implementation("org.mariadb.jdbc:mariadb-java-client:2.1.2")
     testImplementation(platform("org.junit:junit-bom:5.10.0"))
     testImplementation("org.junit.jupiter:junit-jupiter")
@@ -30,9 +28,6 @@ java {
     targetCompatibility = JavaVersion.VERSION_1_8
 }
 
-tasks.withType<JavaCompile> {
-    options.compilerArgs.addAll(listOf("-Xlint:-options"))
-}
 
 tasks.withType<Test> {
     useJUnitPlatform()

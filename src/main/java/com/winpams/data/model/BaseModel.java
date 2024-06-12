@@ -1,7 +1,7 @@
-package com.winpams.core.model;
+package com.winpams.data.model;
 
-import com.winpams.core.Database;
-import com.winpams.core.annotations.*;
+import com.winpams.data.Database;
+import com.winpams.data.annotations.*;
 import com.winpams.core.exceptions.NoAnnotation;
 import org.javatuples.Pair;
 
