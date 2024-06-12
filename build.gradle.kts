@@ -1,6 +1,5 @@
 plugins {
     id("java")
-    id("io.freefair.aspectj.post-compile-weaving") version "8.6"
 }
 
 group = "com.winpams"
@@ -26,6 +25,10 @@ tasks.test {
 java {
     sourceCompatibility = JavaVersion.VERSION_1_8
     targetCompatibility = JavaVersion.VERSION_1_8
+}
+
+tasks.withType<JavaCompile> {
+    options.compilerArgs.addAll(listOf("-Xlint:-options"))
 }
 
 
