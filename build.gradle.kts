@@ -16,6 +16,7 @@ dependencies {
     implementation("com.mysql:mysql-connector-j:8.4.0")
     implementation("org.aspectj:aspectjrt:1.9.7")
     implementation("org.aspectj:aspectjweaver:1.9.7")
+    implementation("org.mariadb.jdbc:mariadb-java-client:2.1.2")
     testImplementation(platform("org.junit:junit-bom:5.10.0"))
     testImplementation("org.junit.jupiter:junit-jupiter")
 }
