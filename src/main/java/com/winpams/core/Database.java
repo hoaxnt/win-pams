@@ -1,14 +1,13 @@
 package com.winpams.core;
 
 
-import com.winpams.core.annotations.Catch;
+import com.winpams.core.annotations.Entity;
 import com.winpams.core.model.BaseModel;
 import org.javatuples.Pair;
 
 import java.sql.*;
 import java.util.Map;
 import java.util.StringJoiner;
-
 
 public class Database implements AutoCloseable {
     public final Connection connection;
@@ -48,15 +47,20 @@ public class Database implements AutoCloseable {
 
 
     public ResultSet execute(String query, Object... params) throws SQLException {
-        PreparedStatement statement = connection.prepareStatement(query);
-        for (int i = 0; i < params.length; i++) {
-            statement.setObject(i + 1, params[i]);
+        if (query.contains("?")) {
+
+            PreparedStatement statement = connection.prepareStatement(query);
+            for (int i = 0; i < params.length; i++) {
+                statement.setObject(i + 1, params[i]);
+            }
+            return statement.executeQuery();
         }
-        return statement.executeQuery();
+
+        return connection.createStatement().executeQuery(query);
     }
 
-    public <T extends BaseModel> Pair<String, Object[]> buildQuery(T model, DatabaseOperation mode, String[] selectColumns, Long id) throws Exception {
-        String tableName = model.getClass().getAnnotation(com.winpams.core.annotations.Table.class).name();
+    public <T extends BaseModel> Pair<String, Object[]> buildQuery(T model, DatabaseOperation mode, String[] selectColumns, Integer id) throws Exception {
+        String tableName = model.getClass().getAnnotation(Entity.class).name();
         Map<String, Object> columns = model.dump();
         String query;
         Object[] params;
@@ -88,13 +92,13 @@ public class Database implements AutoCloseable {
 
                 break;
             case DELETE:
-                params = new Object[]{model.id};
+                params = new Object[] { model.id };
                 query = "DELETE FROM " + tableName + " WHERE id = ?";
                 break;
 
             case SELECT:
                 String selectColumnsString = (selectColumns == null || selectColumns.length == 0) ? "*" : String.join(", ", selectColumns);
-                params = new Object[]{id};
+                params = new Object[] { id };
                 query = "SELECT " + selectColumnsString + " FROM " + tableName;
 
                 if (id != null) {
@@ -118,7 +122,7 @@ public class Database implements AutoCloseable {
         return buildQuery(model, mode, selectColumns, null);
     }
 
-    public <T extends BaseModel> Pair<String, Object[]> buildQuery(T model, DatabaseOperation mode, Long id) throws Exception {
+    public <T extends BaseModel> Pair<String, Object[]> buildQuery(T model, DatabaseOperation mode, Integer id) throws Exception {
         return buildQuery(model, mode, null, id);
     }
 }
