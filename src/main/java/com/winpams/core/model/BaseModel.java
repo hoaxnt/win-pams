@@ -6,54 +6,42 @@ import com.winpams.core.annotations.*;
 import com.winpams.core.exceptions.NoAnnotation;
 import org.javatuples.Pair;
 
+
 import java.lang.reflect.Field;
 import java.sql.ResultSet;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.sql.Timestamp;
+import java.util.*;
 
 public abstract class BaseModel {
     @Id
     @Column(name = "id")
-    public Long id;
+    public Integer id;
 
     @Column(name = "created_at")
-    public Long createdAt;
+    public Timestamp createdAt;
 
     @Column(name = "updated_at")
-    public Long updatedAt;
+    public Timestamp updatedAt;
 
     public BaseModel() {
-        this.createdAt = System.currentTimeMillis();
-        this.updatedAt = System.currentTimeMillis();
+        this.createdAt = new Timestamp(System.currentTimeMillis());
+        this.updatedAt = new Timestamp(System.currentTimeMillis());
     }
 
     public Map<String, Object> dump() throws Exception {
-        boolean table = this.getClass().isAnnotationPresent(Table.class);
+        boolean table = this.getClass().isAnnotationPresent(Entity.class);
 
         if (!table) throw new NoAnnotation("Table annotation is missing");
 
         Map<String, Object> map = new HashMap<>();
-        Class<?> currentClass = this.getClass();
 
-        while (currentClass != null) {
-            Field[] fields = currentClass.getDeclaredFields();
+        for (Field field : getFields()) {
+            if (!field.isAnnotationPresent(Column.class)) continue;
 
-            for (Field field : fields) {
-                boolean column = field.isAnnotationPresent(Column.class);
-                if (!column) continue;
-
-                Column columnAnnotation = field.getAnnotation(Column.class);
-
-                field.setAccessible(true);
-                String columnName = columnAnnotation.name();
-                Object value = field.get(this);
-
-                map.put(columnName, value);
-            }
-
-            currentClass = currentClass.getSuperclass();
+            field.setAccessible(true);
+            Column column = field.getAnnotation(Column.class);
+            Object value = field.get(this);
+            map.put(column.name(), value);
         }
 
         return map;
@@ -61,18 +49,19 @@ public abstract class BaseModel {
 
     private <T extends BaseModel> List<T> load(ResultSet result) throws Exception {
 
-        @SuppressWarnings("unchecked") Class<T> modelClass = (Class<T>) this.getClass();
         List<T> models = new ArrayList<>();
 
         do {
-            T model = modelClass.getDeclaredConstructor().newInstance();
-            for (Field field : modelClass.getDeclaredFields()) {
-                if (field.isAnnotationPresent(Column.class)) {
-                    field.setAccessible(true);
-                    Column column = field.getAnnotation(Column.class);
-                    Object value = result.getObject(column.name());
-                    field.set(model, value);
-                }
+            @SuppressWarnings("unchecked")
+            T model = (T) this.getClass().getDeclaredConstructor().newInstance();
+
+            for (Field field : getFields()) {
+                if (!field.isAnnotationPresent(Column.class)) continue;
+
+                field.setAccessible(true);
+                Column column = field.getAnnotation(Column.class);
+                Object value = result.getObject(column.name());
+                field.set(model, value);
             }
             models.add(model);
         } while (result.next());
@@ -100,23 +89,18 @@ public abstract class BaseModel {
         db.execute(query.getValue0(), query.getValue1());
     }
 
-    public <T extends BaseModel> List<T> find(Long id, String[] cols) throws Exception {
+    public <T extends BaseModel> List<T> find(Integer id, String[] cols) throws Exception {
         Database db = Database.getInstance();
-        @SuppressWarnings("unchecked")
 
         Pair<String, Object[]> query = db.buildQuery(this, DatabaseOperation.SELECT, cols, id);
+        ResultSet result = db.execute(query.getValue0(), query.getValue1());
 
-        System.out.println(query.getValue0());
+        if (!result.next()) return null;
 
-        return null;
-//        ResultSet result = db.execute(query.getValue0(), query.getValue1());
-//
-//        if (!result.next()) return null;
-//
-//        return load(result);
+        return load(result);
     }
 
-    public <T extends BaseModel> T find(Long id) throws Exception {
+    public <T extends BaseModel> T find(Integer id) throws Exception {
         if (id == null) throw new IllegalArgumentException("id cannot be null");
 
         List<T> models = find(id, null);
@@ -132,5 +116,25 @@ public abstract class BaseModel {
 
     public <T extends BaseModel> List<T> all(String[] cols) throws Exception {
         return find(null, cols);
+    }
+
+    @Override
+    public String toString() {
+        String className = this.getClass().getSimpleName();
+
+        return "<" + className + " id=" + this.id + ">";
+    }
+
+    private List<Field> getFields() {
+        List<Field> fields = new ArrayList<>();
+        Class<?> currentClass = this.getClass();
+
+        while (currentClass != null) {
+            Field[] currentFields = currentClass.getDeclaredFields();
+            fields.addAll(Arrays.asList(currentFields));
+            currentClass = currentClass.getSuperclass();
+        }
+
+        return fields;
     }
 }
