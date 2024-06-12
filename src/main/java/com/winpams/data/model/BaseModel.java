@@ -69,7 +69,7 @@ public abstract class BaseModel {
     }
 
     public void save() throws Exception {
-        Database db = Database.getInstance();
+        Database db = Database.instance();
 
         if (this.id != null) {
             Pair<String, Object[]> query = db.buildQuery(this, Database.Operation.UPDATE);
@@ -83,13 +83,13 @@ public abstract class BaseModel {
     }
 
     public void delete() throws Exception {
-        Database db = Database.getInstance();
+        Database db = Database.instance();
         Pair<String, Object[]> query = db.buildQuery(this, Database.Operation.DELETE);
         db.execute(query.getValue0(), query.getValue1());
     }
 
     public <T extends BaseModel> List<T> find(Integer id, String[] cols) throws Exception {
-        Database db = Database.getInstance();
+        Database db = Database.instance();
 
         Pair<String, Object[]> query = db.buildQuery(this, Database.Operation.SELECT, cols, id);
         ResultSet result = db.execute(query.getValue0(), query.getValue1());

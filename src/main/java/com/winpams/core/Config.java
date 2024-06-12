@@ -3,21 +3,9 @@ package com.winpams.core;
 import io.github.cdimascio.dotenv.Dotenv;
 
 public class Config {
-    private final Dotenv dotenv;
+    private static final Dotenv dotenv = Dotenv.load();
 
-    private Config() {
-        dotenv = Dotenv.load();
-    }
-
-    private static class Holder {
-        private static final Config INSTANCE = new Config();
-    }
-
-    public static Config getInstance() {
-        return Holder.INSTANCE;
-    }
-
-    public String getValue(String key) {
+    public static String get(String key) {
         return dotenv.get(key);
     }
 }

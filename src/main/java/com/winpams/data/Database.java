@@ -1,7 +1,6 @@
 package com.winpams.data;
 
 
-import com.winpams.core.Config;
 import com.winpams.data.annotations.Entity;
 import com.winpams.data.model.BaseModel;
 import org.javatuples.Pair;
@@ -22,16 +21,14 @@ public class Database implements AutoCloseable {
         WHERE
     }
 
-    public final Connection connection;
+    public static Connection connection;
 
-    private Database() throws SQLException {
-        Config config = Config.getInstance();
+    public static void connect(String url, String user, String password) throws Exception{
+        if (connection != null) {
+            throw new IllegalStateException("Connection already established");
+        }
 
-        String url = config.getValue("DB_URL");
-        String user = config.getValue("DB_USER");
-        String password = config.getValue("DB_PASSWORD");
-
-        this.connection = DriverManager.getConnection(url, user, password);
+        connection = DriverManager.getConnection(url, user, password);
     }
 
     @Override
@@ -45,15 +42,11 @@ public class Database implements AutoCloseable {
         private static final Database INSTANCE;
 
         static {
-            try {
-                INSTANCE = new Database();
-            } catch (SQLException e) {
-                throw new RuntimeException(e);
-            }
+            INSTANCE = new Database();
         }
     }
 
-    public static Database getInstance() {
+    public static Database instance() {
         return Database.Holder.INSTANCE;
     }
 
