@@ -21,6 +21,7 @@ public class CatchAspect {
         try {
             return joinPoint.proceed();
         } catch (Exception e) {
+            System.err.println("An exception occurred: " + e.getMessage());
             // Handle the exception (log it, rethrow it, etc.)
             e.printStackTrace();
             return null;
