@@ -135,11 +135,7 @@ public abstract class BaseModel {
         }
 
         public QueryBuilder<T> where(String column, Object value) {
-            if (whereClauses.isEmpty()) {
-                whereClauses.add(column + " = ?");
-            } else {
-                whereClauses.add("AND " + column + " = ?");
-            }
+            whereClauses.add((whereClauses.isEmpty() ? "" : "AND ") + column + " = ?");
             parameters.add(value);
             return this;
         }
@@ -157,7 +153,7 @@ public abstract class BaseModel {
         }
 
         public QueryBuilder<T> like(String column, Object value) {
-            whereClauses.add(column + " LIKE ?");
+            whereClauses.add((whereClauses.isEmpty() ? "" : "AND ") + column + " LIKE ?");
             parameters.add(value);
             return this;
         }
@@ -204,26 +200,14 @@ public abstract class BaseModel {
         }
 
         public T find(Integer id) throws Exception {
-            if (id == null) throw new IllegalArgumentException("id cannot be null");
             where("id", id);
             List<T> models = execute();
             if (models == null || models.isEmpty()) return null;
             return models.get(0);
         }
 
-        public List<T> find(Integer id, String[] cols) throws Exception {
-            Database db = Database.instance();
-            Pair<String, Object[]> query = db.buildQuery(modelClass.getDeclaredConstructor().newInstance(), Database.Operation.SELECT, cols, id);
-            ResultSet result = db.execute(query.getValue0(), query.getValue1());
-            return load(modelClass, result);
-        }
-
         public List<T> all() throws Exception {
             return execute();
-        }
-
-        public List<T> all(String[] cols) throws Exception {
-            return find(null, cols);
         }
 
         public T first() throws Exception {
@@ -235,15 +219,6 @@ public abstract class BaseModel {
         public T last() throws Exception {
             List<T> models = execute();
             if (models == null || models.isEmpty()) return null;
-            return models.get(models.size() - 1);
-        }
-
-        public T first(String[] cols) throws Exception {
-            return find(null, cols).get(0);
-        }
-
-        public T last(String[] cols) throws Exception {
-            List<T> models = find(null, cols);
             return models.get(models.size() - 1);
         }
     }
