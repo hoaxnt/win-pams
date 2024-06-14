@@ -65,13 +65,12 @@ public class QueryBuilder<T extends BaseModel> {
         StringBuilder query = new StringBuilder("SELECT * FROM ");
         query.append(getTableName());
 
-        if (!whereClauses.isEmpty()) {
+        if (!whereClauses.isEmpty())
             query.append(" WHERE ").append(String.join(" ", whereClauses));
-        }
 
-        if (!orderByClauses.isEmpty()) {
+        if (!orderByClauses.isEmpty())
             query.append(" ORDER BY ").append(String.join(", ", orderByClauses));
-        }
+
 
         ResultSet result = db.execute(query.toString(), parameters.toArray());
         return load(modelClass, result);
