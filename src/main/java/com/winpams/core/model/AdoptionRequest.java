@@ -1,5 +1,6 @@
 package com.winpams.core.model;
 
+import com.winpams.data.QueryBuilder;
 import com.winpams.data.annotations.Column;
 import com.winpams.data.annotations.Entity;
 import com.winpams.data.model.BaseModel;
