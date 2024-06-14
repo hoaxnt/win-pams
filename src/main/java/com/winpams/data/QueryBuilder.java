@@ -50,6 +50,12 @@ public class QueryBuilder<T extends BaseModel> {
         return this;
     }
 
+    public QueryBuilder<T> lessThan(String column, Object value) {
+        whereClauses.add(column + " < ?");
+        parameters.add(value);
+        return this;
+    }
+
     public QueryBuilder<T> orderBy(String column) {
         orderByClauses.add(column);
         return this;
