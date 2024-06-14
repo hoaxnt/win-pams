@@ -21,7 +21,7 @@ public class QueryBuilder<T extends BaseModel> {
     }
 
     public QueryBuilder<T> where(String column, Object value) {
-        whereClauses.add((whereClauses.isEmpty() ? "" : "AND ") + column + " = ?");
+        whereClauses.add(column + " = ?");
         parameters.add(value);
         return this;
     }
@@ -39,7 +39,7 @@ public class QueryBuilder<T extends BaseModel> {
     }
 
     public QueryBuilder<T> like(String column, Object value) {
-        whereClauses.add((whereClauses.isEmpty() ? "" : "AND ") + column + " LIKE ?");
+        whereClauses.add(column + " LIKE ?");
         parameters.add(value);
         return this;
     }
@@ -56,13 +56,76 @@ public class QueryBuilder<T extends BaseModel> {
         return this;
     }
 
-    public QueryBuilder<T> orderBy(String column) {
-        orderByClauses.add(column);
+    public QueryBuilder<T> between(String column, Object value1, Object value2) {
+        whereClauses.add(column + " BETWEEN ? AND ?");
+        parameters.add(value1);
+        parameters.add(value2);
         return this;
     }
 
-    public QueryBuilder<T> orderBy(String column, String order) {
-        orderByClauses.add(column + " " + order);
+    public QueryBuilder<T> notEqual(String column, Object value) {
+        whereClauses.add(column + " != ?");
+        parameters.add(value);
+        return this;
+    }
+
+    public QueryBuilder<T> isNull(String column) {
+        whereClauses.add(column + " IS NULL");
+        return this;
+    }
+
+    public QueryBuilder<T> isNotNull(String column) {
+        whereClauses.add(column + " IS NOT NULL");
+        return this;
+    }
+
+    public QueryBuilder<T> notBetween(String column, Object value1, Object value2) {
+        whereClauses.add(column + " NOT BETWEEN ? AND ?");
+        parameters.add(value1);
+        parameters.add(value2);
+        return this;
+    }
+
+    public QueryBuilder<T> in(String column, Object... values) {
+        StringBuilder inClause = new StringBuilder(column + " IN (");
+        return buildInQuery(inClause, values);
+    }
+
+    public QueryBuilder<T> notIn(String column, Object... values) {
+        StringBuilder inClause = new StringBuilder(column + " NOT IN (");
+        return buildInQuery(inClause, values);
+    }
+
+    private QueryBuilder<T> buildInQuery(StringBuilder inClause, Object[] values) {
+        for (int i = 0; i < values.length; i++) {
+            inClause.append("?");
+            if (i < values.length - 1)
+                inClause.append(", ");
+
+            parameters.add(values[i]);
+        }
+        inClause.append(")");
+        whereClauses.add(inClause.toString());
+        return this;
+    }
+
+    public QueryBuilder<T> asc(String column) {
+        orderByClauses.add(column + " ASC");
+        return this;
+    }
+
+    public QueryBuilder<T> asc() {
+        orderByClauses.add("id ASC");
+        return this;
+    }
+
+    public QueryBuilder<T> desc() {
+        orderByClauses.add("id DESC");
+        return this;
+    }
+
+    public QueryBuilder<T> desc(String column) {
+        orderByClauses.add(column + " DESC");
         return this;
     }
 
@@ -72,11 +135,10 @@ public class QueryBuilder<T extends BaseModel> {
         query.append(getTableName());
 
         if (!whereClauses.isEmpty())
-            query.append(" WHERE ").append(String.join(" ", whereClauses));
+            query.append(" WHERE ").append(String.join(" AND ", whereClauses));
 
         if (!orderByClauses.isEmpty())
             query.append(" ORDER BY ").append(String.join(", ", orderByClauses));
-
 
         ResultSet result = db.execute(query.toString(), parameters.toArray());
         return load(modelClass, result);
@@ -84,9 +146,9 @@ public class QueryBuilder<T extends BaseModel> {
 
     private String getTableName() throws NoAnnotation {
         Entity entity = modelClass.getAnnotation(Entity.class);
-        if (entity == null) {
-            throw new NoAnnotation("Table annotation is missing");
-        }
+
+        if (entity == null) throw new NoAnnotation("Table annotation is missing");
+
         return entity.name();
     }
 
@@ -112,8 +174,7 @@ public class QueryBuilder<T extends BaseModel> {
         if (models == null || models.isEmpty()) return null;
         return models.get(models.size() - 1);
     }
-
-
+    
     private List<T> load(Class<T> modelClass, ResultSet result) throws Exception {
         List<T> models = new ArrayList<>();
 
