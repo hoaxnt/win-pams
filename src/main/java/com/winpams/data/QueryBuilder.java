@@ -141,6 +141,11 @@ public class QueryBuilder<T extends BaseModel> {
             query.append(" ORDER BY ").append(String.join(", ", orderByClauses));
 
         ResultSet result = db.execute(query.toString(), parameters.toArray());
+
+        whereClauses.clear();
+        parameters.clear();
+        orderByClauses.clear();
+
         return load(modelClass, result);
     }
 
@@ -174,7 +179,7 @@ public class QueryBuilder<T extends BaseModel> {
         if (models == null || models.isEmpty()) return null;
         return models.get(models.size() - 1);
     }
-    
+
     private List<T> load(Class<T> modelClass, ResultSet result) throws Exception {
         List<T> models = new ArrayList<>();
 
