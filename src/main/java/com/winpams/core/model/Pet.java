@@ -22,4 +22,6 @@ public class Pet extends BaseModel {
 
     @Column(name = "description")
     public String description;
+
+    public final static QueryBuilder<Pet> query = new QueryBuilder<>(Pet.class);
 }

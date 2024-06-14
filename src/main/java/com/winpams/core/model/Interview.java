@@ -19,4 +19,6 @@ public class Interview extends BaseModel {
 
     @Column(name = "end")
     public Timestamp end;
+
+    public final static QueryBuilder<Interview> query = new QueryBuilder<>(Interview.class);
 }

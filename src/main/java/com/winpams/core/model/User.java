@@ -26,4 +26,6 @@ public class User extends BaseModel {
 
     @Column(name = "is_admin")
     public Boolean isAdmin = false;
+
+    public final static QueryBuilder<User> query = new QueryBuilder<>(User.class);
 }

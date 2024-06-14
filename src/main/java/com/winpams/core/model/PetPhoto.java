@@ -11,4 +11,6 @@ public class PetPhoto extends BaseModel {
 
     @Column(name = "photo_url")
     public String url;
+
+    public final static QueryBuilder<PetPhoto> query = new QueryBuilder<>(PetPhoto.class);
 }

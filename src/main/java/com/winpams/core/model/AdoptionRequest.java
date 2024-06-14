@@ -23,4 +23,6 @@ public class AdoptionRequest extends BaseModel {
 
     @Column(name = "additional_info")
     public String additionalInfo;
+
+    public final static QueryBuilder<AdoptionRequest> query = new QueryBuilder<>(AdoptionRequest.class);
 }
