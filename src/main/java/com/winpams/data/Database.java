@@ -1,6 +1,7 @@
 package com.winpams.data;
 
 
+import com.winpams.core.exceptions.ConnectionError;
 import com.winpams.data.annotations.Entity;
 import com.winpams.data.model.BaseModel;
 import org.javatuples.Pair;
@@ -21,18 +22,23 @@ public class Database implements AutoCloseable {
         WHERE
     }
 
-    public static Connection connection;
+    private static Connection connection;
 
-    public static void connect(String url, String user, String password) throws Exception{
+    private Database() throws ConnectionError {
+        if (connection == null)
+            throw new ConnectionError("Connection not established. Call connect() first.");
+    }
+
+    public static void connect(String url, String user, String password) throws SQLException, ConnectionError {
         if (connection != null) {
-            throw new IllegalStateException("Connection already established");
+            throw new ConnectionError("Connection already established");
         }
 
         connection = DriverManager.getConnection(url, user, password);
     }
 
     @Override
-    public void close() throws Exception {
+    public void close() throws SQLException {
         if (connection == null) return;
 
         connection.close();
@@ -42,7 +48,11 @@ public class Database implements AutoCloseable {
         private static final Database INSTANCE;
 
         static {
-            INSTANCE = new Database();
+            try {
+                INSTANCE = new Database();
+            } catch (ConnectionError e) {
+                throw new RuntimeException(e);
+            }
         }
     }
 
