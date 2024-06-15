@@ -10,6 +10,7 @@ repositories {
 }
 
 dependencies {
+    implementation("com.intellij:forms_rt:7.0.3")
     implementation("org.javatuples:javatuples:1.2")
     implementation("io.github.cdimascio:dotenv-java:2.2.0")
     implementation("com.mysql:mysql-connector-j:8.4.0")
