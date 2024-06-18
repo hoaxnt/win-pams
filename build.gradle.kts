@@ -10,6 +10,7 @@ repositories {
 }
 
 dependencies {
+    implementation("com.formdev:flatlaf:3.4.1")
     implementation("com.intellij:forms_rt:7.0.3")
     implementation("org.javatuples:javatuples:1.2")
     implementation("io.github.cdimascio:dotenv-java:2.2.0")
