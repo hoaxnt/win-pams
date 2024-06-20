@@ -3,12 +3,13 @@ package com.winpams.user;
 
 import com.formdev.flatlaf.themes.FlatMacDarkLaf;
 import com.winpams.core.ui.Navigator;
+import com.winpams.user.ui.Login;
 
 import javax.swing.*;
 import java.awt.*;
 
 public class Main extends JFrame {
-    static Navigator navigator;
+    public static Navigator navigator;
 
     public static void main(String[] args) {
         JFrame frame = new JFrame("WinPAMS");
