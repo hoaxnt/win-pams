@@ -58,8 +58,9 @@ public class Register {
         boolean err = false;
 
         if (first.isEmpty() || last.isEmpty() || mail.isEmpty() || phone.isEmpty() || usernameString.isEmpty() || pass.isEmpty() || conf.isEmpty()) {
-            message.append("Please fill in all fields.\n");
-            err = true;
+            feedback.setText("Please fill in all fields.");
+            feedback.setVisible(true);
+            return;
         }
 
         String validPass = validatePassword();
@@ -71,17 +72,17 @@ public class Register {
 
 
         if (!mail.matches("^[A-Za-z0-9+_.-]+@(.+)$")) {
-            message.append("Invalid email format.\n");
+            message.append("Invalid email format.<br/>");
             err = true;
         }
 
         if (!phone.matches("\\d{10}")) {
-            message.append("Invalid phone number format. It should contain exactly 10 digits.\n");
+            message.append("Invalid phone number format. It should contain exactly 10 digits.<br/>");
             err = true;
         }
 
         if (err) {
-            feedback.setText(message.toString());
+            feedback.setText("<html>" + message + "</html>");
             feedback.setVisible(true);
             return;
         }
@@ -95,17 +96,17 @@ public class Register {
 
         try {
             if (User.query.where("username", usernameString).first() != null) {
-                message.append("Username already exists.\n");
+                message.append("Username already exists.<br/>");
                 err = true;
             }
 
             if (User.query.where("email", mail).first() != null) {
-                message.append("Email already exists.\n");
+                message.append("Email already exists.<br/>");
                 err = true;
             }
 
             if (err) {
-                feedback.setText(message.toString());
+                feedback.setText("<html>" + message + "</html>");
                 feedback.setVisible(true);
                 return;
             }
@@ -145,22 +146,22 @@ public class Register {
         String confirm = new String(this.confirm.getPassword());
 
         if (password.length() < 8)
-            message.append("Password must be at least 8 characters long.\n");
+            message.append("Password must be at least 8 characters long.<br/>");
 
         if (!password.matches(".*\\d.*"))
-            message.append("Password must contain at least one digit.\n");
+            message.append("Password must contain at least one digit.<br/>");
 
         if (!password.matches(".*[!@#$%^&*()_+\\-=\\[\\]{};':\"\\\\|,.<>\\/?`~].*"))
-            message.append("Password must contain at least one special character.\n");
+            message.append("Password must contain at least one special character.<br/>");
 
         if (!password.matches(".*[A-Z].*"))
-            message.append("Password must contain at least one uppercase letter.\n");
+            message.append("Password must contain at least one uppercase letter.<br/>");
 
         if (!password.matches(".*[a-z].*"))
-            message.append("Password must contain at least one lowercase letter.\n");
+            message.append("Password must contain at least one lowercase letter.<br/>");
 
         if (!password.equals(confirm))
-            message.append("Passwords do not match.\n");
+            message.append("Passwords do not match.<br/>");
 
         return message.toString();
     }
