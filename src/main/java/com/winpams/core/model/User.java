@@ -8,8 +8,8 @@ import com.winpams.data.model.BaseModel;
 
 @Entity(name = "users")
 public class User extends BaseModel {
-    @Column(name = "given_name")
-    public String givenName;
+    @Column(name = "first_name")
+    public String firstName;
 
     @Column(name = "last_name")
     public String lastName;

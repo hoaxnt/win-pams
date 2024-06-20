@@ -87,7 +87,7 @@ public class Register {
             return;
         }
 
-        user.givenName = first;
+        user.firstName = first;
         user.lastName = last;
         user.email = mail;
         user.contactNumber = phone;
