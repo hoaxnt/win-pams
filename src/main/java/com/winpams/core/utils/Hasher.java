@@ -1,10 +1,14 @@
 package com.winpams.core.utils;
 
+import com.winpams.core.Config;
+
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 
 public class Hasher {
-    public static String hashPassword(String password, String salt) {
+    public static String hashPassword(String password) {
+        String salt = Config.get("SALT");
+
         try {
             MessageDigest md = MessageDigest.getInstance("SHA-256");
 
@@ -25,8 +29,8 @@ public class Hasher {
         }
     }
 
-    public static boolean verifyPassword(String password, String salt, String hashedPassword) {
-        String hashOfInput = hashPassword(password, salt);
+    public static boolean verifyPassword(String password, String hashedPassword) {
+        String hashOfInput = hashPassword(password);
 
         return hashOfInput.equals(hashedPassword);
     }
