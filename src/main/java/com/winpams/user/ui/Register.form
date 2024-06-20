@@ -60,7 +60,7 @@
                       <text value="Firstname"/>
                     </properties>
                   </component>
-                  <component id="3a459" class="javax.swing.JTextField" default-binding="true">
+                  <component id="3a459" class="javax.swing.JTextField" binding="firstName">
                     <constraints>
                       <grid row="1" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="6" anchor="8" fill="1" indent="0" use-parent-layout="false">
                         <preferred-size width="150" height="-1"/>
@@ -86,7 +86,7 @@
                       <text value="Lastname"/>
                     </properties>
                   </component>
-                  <component id="35351" class="javax.swing.JTextField" default-binding="true">
+                  <component id="35351" class="javax.swing.JTextField" binding="lastName">
                     <constraints>
                       <grid row="1" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="6" anchor="8" fill="1" indent="0" use-parent-layout="false">
                         <preferred-size width="150" height="-1"/>
@@ -114,7 +114,7 @@
                   <text value="Email"/>
                 </properties>
               </component>
-              <component id="9628e" class="javax.swing.JTextField" default-binding="true">
+              <component id="9628e" class="javax.swing.JTextField" binding="email">
                 <constraints>
                   <grid row="1" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="6" anchor="8" fill="1" indent="0" use-parent-layout="false">
                     <preferred-size width="150" height="-1"/>
@@ -148,7 +148,7 @@
                       <text value="Contact Number"/>
                     </properties>
                   </component>
-                  <component id="db86a" class="javax.swing.JTextField" default-binding="true">
+                  <component id="db86a" class="javax.swing.JTextField" binding="contact">
                     <constraints>
                       <grid row="1" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="6" anchor="8" fill="1" indent="0" use-parent-layout="false">
                         <preferred-size width="150" height="-1"/>
@@ -174,7 +174,7 @@
                       <text value="Username"/>
                     </properties>
                   </component>
-                  <component id="fb0c9" class="javax.swing.JTextField" default-binding="true">
+                  <component id="fb0c9" class="javax.swing.JTextField" binding="username">
                     <constraints>
                       <grid row="1" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="6" anchor="8" fill="1" indent="0" use-parent-layout="false">
                         <preferred-size width="150" height="-1"/>
