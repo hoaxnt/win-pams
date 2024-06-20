@@ -2,9 +2,11 @@ package com.winpams.user;
 
 import javax.swing.*;
 import java.awt.*;
+import java.awt.event.ActionEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.font.TextAttribute;
+import java.util.HashMap;
 import java.util.Map;
 import com.winpams.user.ui.Register;
 
@@ -19,32 +21,25 @@ public class Login {
     private JLabel hasAccount;
 
     public Login() {
-        login.addActionListener(e -> login());
-        username.addActionListener(e -> login());
-        password.addActionListener(e -> login());
+        login.addActionListener(this::login);
+        username.addActionListener(this::login);
+        password.addActionListener(this::login);
 
         hasAccount.addMouseListener(new MouseAdapter() {
+            final Font font = hasAccount.getFont();
+            final Map<TextAttribute, Object> attributes = new HashMap<>(font.getAttributes());
+
             public void mouseClicked(MouseEvent evt) {
                 Main.navigator.show(new Register().panel);
             }
 
             public void mouseEntered(MouseEvent evt) {
-                // Change the text to underline when the mouse enters the label
-                Font font = hasAccount.getFont();
-
-                Map attributes = font.getAttributes();
-
                 attributes.put(TextAttribute.UNDERLINE, TextAttribute.UNDERLINE_ON);
 
                 hasAccount.setFont(font.deriveFont(attributes));
             }
 
             public void mouseExited(MouseEvent evt) {
-                // Change the text to normal when the mouse exits the label
-                Font font = hasAccount.getFont();
-
-                Map attributes = font.getAttributes();
-
                 attributes.put(TextAttribute.UNDERLINE, -1);
 
                 hasAccount.setFont(font.deriveFont(attributes));
@@ -52,7 +47,7 @@ public class Login {
         });
     }
 
-    private void login() {
+    private void login(ActionEvent evt) {
         // Create a new panel to display the welcome message should be replaced with the actual application.
         JPanel test = new JPanel();
         JButton logout = new JButton("Logout");
