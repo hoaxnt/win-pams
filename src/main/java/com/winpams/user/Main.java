@@ -9,7 +9,7 @@ import javax.swing.*;
 import java.awt.*;
 
 public class Main extends JFrame {
-    public static Navigator navigator;
+    static Navigator navigator;
 
     public static void main(String[] args) {
         JFrame frame = new JFrame("WinPAMS");
