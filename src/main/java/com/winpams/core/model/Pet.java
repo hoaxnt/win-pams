@@ -12,9 +12,6 @@ public class Pet extends BaseModel {
     @Column(name = "name")
     public String name;
 
-    @Column(name = "species")
-    public String species;
-
     @Column(name = "breed")
     public String breed;
 
