@@ -9,50 +9,67 @@ import java.lang.reflect.Field;
 import java.sql.ResultSet;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 public class QueryBuilder<T extends BaseModel> {
     private final Class<T> modelClass;
     private final List<String> whereClauses = new ArrayList<>();
     private final List<Object> parameters = new ArrayList<>();
     private final List<String> orderByClauses = new ArrayList<>();
+    private String lastLogicalOperator = "";
 
     public QueryBuilder(Class<T> modelClass) {
         this.modelClass = modelClass;
     }
 
     public QueryBuilder<T> where(String column, Object value) {
+        if (!whereClauses.isEmpty() && lastLogicalOperator.isEmpty())
+            throw new IllegalArgumentException("Logical operator (AND, OR) must be used between conditions");
+
         whereClauses.add(column + " = ?");
         parameters.add(value);
+        lastLogicalOperator = "";
         return this;
     }
 
     public QueryBuilder<T> and(String column, Object value) {
+        if (whereClauses.isEmpty())
+            throw new IllegalArgumentException("AND cannot be used as the first condition");
+
         whereClauses.add("AND " + column + " = ?");
         parameters.add(value);
+        lastLogicalOperator = "AND";
         return this;
     }
 
     public QueryBuilder<T> or(String column, Object value) {
+        if (whereClauses.isEmpty())
+            throw new IllegalArgumentException("OR cannot be used as the first condition");
+
         whereClauses.add("OR " + column + " = ?");
         parameters.add(value);
+        lastLogicalOperator = "OR";
         return this;
     }
 
     public QueryBuilder<T> like(String column, Object value) {
         whereClauses.add(column + " LIKE ?");
         parameters.add(value);
+        lastLogicalOperator = "";
         return this;
     }
 
     public QueryBuilder<T> greaterThan(String column, Object value) {
         whereClauses.add(column + " > ?");
         parameters.add(value);
+        lastLogicalOperator = "";
         return this;
     }
 
     public QueryBuilder<T> lessThan(String column, Object value) {
         whereClauses.add(column + " < ?");
         parameters.add(value);
+        lastLogicalOperator = "";
         return this;
     }
 
@@ -60,22 +77,26 @@ public class QueryBuilder<T extends BaseModel> {
         whereClauses.add(column + " BETWEEN ? AND ?");
         parameters.add(value1);
         parameters.add(value2);
+        lastLogicalOperator = "";
         return this;
     }
 
     public QueryBuilder<T> notEqual(String column, Object value) {
         whereClauses.add(column + " != ?");
         parameters.add(value);
+        lastLogicalOperator = "";
         return this;
     }
 
     public QueryBuilder<T> isNull(String column) {
         whereClauses.add(column + " IS NULL");
+        lastLogicalOperator = "";
         return this;
     }
 
     public QueryBuilder<T> isNotNull(String column) {
         whereClauses.add(column + " IS NOT NULL");
+        lastLogicalOperator = "";
         return this;
     }
 
@@ -83,6 +104,7 @@ public class QueryBuilder<T extends BaseModel> {
         whereClauses.add(column + " NOT BETWEEN ? AND ?");
         parameters.add(value1);
         parameters.add(value2);
+        lastLogicalOperator = "";
         return this;
     }
 
@@ -106,6 +128,7 @@ public class QueryBuilder<T extends BaseModel> {
         }
         inClause.append(")");
         whereClauses.add(inClause.toString());
+        lastLogicalOperator = "";
         return this;
     }
 
@@ -135,7 +158,7 @@ public class QueryBuilder<T extends BaseModel> {
         query.append(getTableName());
 
         if (!whereClauses.isEmpty())
-            query.append(" WHERE ").append(String.join(" AND ", whereClauses));
+            query.append(" WHERE ").append(String.join(" ", whereClauses));
 
         if (!orderByClauses.isEmpty())
             query.append(" ORDER BY ").append(String.join(", ", orderByClauses));
@@ -145,6 +168,7 @@ public class QueryBuilder<T extends BaseModel> {
         whereClauses.clear();
         parameters.clear();
         orderByClauses.clear();
+        lastLogicalOperator = "";
 
         return load(modelClass, result);
     }
@@ -186,13 +210,14 @@ public class QueryBuilder<T extends BaseModel> {
         while (result.next()) {
             T model = modelClass.getDeclaredConstructor().newInstance();
 
-            for (Field field : model.getFields()) {
+            for (Field field : modelClass.getDeclaredFields()) {
                 field.setAccessible(true);
 
                 Column column = field.getAnnotation(Column.class);
-                Object value = result.getObject(column.name());
-
-                field.set(model, value);
+                if (column != null) {
+                    Object value = result.getObject(column.name());
+                    field.set(model, value);
+                }
             }
             models.add(model);
         }
