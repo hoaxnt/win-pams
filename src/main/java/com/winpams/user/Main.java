@@ -1,11 +1,10 @@
 package com.winpams.user;
 
 import com.formdev.flatlaf.themes.FlatMacLightLaf;
-import com.winpams.core.Config;
 import com.winpams.core.ui.Navigator;
+import com.winpams.user.ui.*;
 import com.winpams.data.Database;
-import com.winpams.user.ui.Login;
-
+import com.winpams.core.Config;
 import javax.swing.*;
 import java.awt.*;
 
