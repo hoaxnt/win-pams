@@ -3,6 +3,7 @@ package com.winpams.user;
 
 import com.formdev.flatlaf.themes.FlatMacDarkLaf;
 import com.winpams.core.ui.Navigator;
+import com.winpams.user.ui.MainFeed;
 
 import javax.swing.*;
 import java.awt.*;
@@ -21,7 +22,9 @@ public class Main extends JFrame {
             FlatMacDarkLaf.setup();
             
             navigator = new Navigator(frame);
-            navigator.show(new Login().panel);
+            //navigator.show(new Test().panel);
+            navigator.show(new MainFeed().panel);
+            //navigator.show(new Login().panel);
         });
     }
 }
