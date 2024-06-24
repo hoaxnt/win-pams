@@ -12,7 +12,7 @@ public class Main extends JFrame {
     public static Navigator navigator;
 
     public static void main(String[] args) throws Exception {
-        Database.connect(Config.get("DB_URL"), Config.get("DB_USER"), Config.get("DB_PASSWORD"));
+        //Database.connect(Config.get("DB_URL"), Config.get("DB_USER"), Config.get("DB_PASSWORD"));
 
         JFrame frame = new JFrame("WinPAMS");
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -23,7 +23,8 @@ public class Main extends JFrame {
         SwingUtilities.invokeLater(() -> {
             FlatMacLightLaf.setup();
             navigator = new Navigator(frame);
-            navigator.show(new Login().panel);
+            navigator.show(new MainFeed().panel);
+//            navigator.show(new Login().panel);
         });
     }
 }

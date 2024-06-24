@@ -8,4 +8,5 @@ public class ApprovalPanel {
     private JButton cancelButton;
     private JTable RequestTable;
     private JButton viewApplicationButton;
+    public JPanel panel1;
 }
